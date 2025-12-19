@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gym Log App｜筋トレ記録 Web アプリ
 
-## Getting Started
+個人で開発した筋力トレーニング記録用の Web アプリです。  
+日々のトレーニング内容（種目・重量・セット数）を記録し、  
+トレーニングの傾向を可視化することを目的としています。
 
-First, run the development server:
+本プロジェクトは、**要件設計 → フロントエンド実装 → API 設計 → データ管理 → デプロイ**  
+までをすべて一人で行いました。
+
+---
+
+## 🔗 Live Demo（オンラインデモ）
+
+**クリックするだけで閲覧可能です（インストール不要）**  
+https://gym-app-theta-gray.vercel.app/
+
+---
+
+## 🛠 使用技術
+
+- **Next.js 16**（App Router）
+- **TypeScript**
+- **Tailwind CSS**
+- **SQLite（better-sqlite3）** ※ ローカル環境
+- **Vercel**（本番環境デプロイ）
+
+---
+
+## ✨ 主な機能
+
+- 📝 トレーニング記録機能  
+  - 日付・トレーニング種目・重量・セット数を記録
+- 🔍 種目フィルタリング  
+  - Bench / Squat など種目名による絞り込み
+- 📊 トレーニング傾向の可視化  
+  - トレーニング回数、単回最高重量などを表示
+- 🌐 API Routes 実装  
+  - Next.js Route Handlers を用いた CRUD 処理
+
+---
+
+## 🧠 設計・実装上の工夫点（面接での説明ポイント）
+
+- **Next.js App Router + API Routes** によるフロントエンド／バックエンド一体構成  
+- ローカル環境では **SQLite** を用いた軽量なデータ永続化を採用  
+- **ローカル環境とクラウド環境（Vercel）の違い** を考慮した設計  
+- デプロイ時に発生した  
+  - TypeScript の型エラー  
+  - Route Handler のパラメータ定義  
+  - Next.js バージョン差分  
+  などの問題をログから特定し、修正を行いました
+
+---
+
+## 🚀 ローカルでの起動方法
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
