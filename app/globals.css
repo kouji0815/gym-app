@@ -1,0 +1,357 @@
+/* =========================
+   Apple っぽいミニマルUI
+   - 余白多め
+   - 薄い境界線
+   - 上品な影
+   - サンフランシスコ系フォント
+   - 角丸大きめ
+   ========================= */
+
+:root {
+  --bg: #f5f5f7;
+  --card: rgba(255, 255, 255, 0.78);
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.06);
+
+  --green: #16a34a;
+  --greenHover: #15803d;
+
+  --blue: #0071e3;
+  --blueHover: #0077ed;
+
+  --btnGray: rgba(0, 0, 0, 0.06);
+  --btnGrayHover: rgba(0, 0, 0, 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 30% -10%, rgba(0, 113, 227, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 85% 0%, rgba(22, 163, 74, 0.10), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 18px 60px;
+}
+
+h1 {
+  margin: 0 0 18px;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+/* カード（半透明 + ブラー） */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+}
+
+/* カード見出し */
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* 入力 */
+label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+input,
+select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  outline: none;
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+}
+
+/* グリッド（重なり防止に minmax） */
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ボタン共通（hoverで拡大） */
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease,
+    opacity 140ms ease;
+  transform: translateZ(0);
+}
+
+button:hover {
+  transform: scale(1.045);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ボタンバリエーション */
+.btn {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--greenHover);
+}
+
+.btn-secondary {
+  background: var(--btnGray);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: var(--btnGrayHover);
+}
+
+/* チャート枠 */
+.chart-wrap {
+  width: 100%;
+  height: 340px;
+  margin-top: 14px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ちょい統計カード */
+.stats {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat-value {
+  margin-top: 6px;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+}
+
+/* 空表示・エラー */
+.empty {
+  margin-top: 12px;
+  color: var(--muted);
+  padding: 14px;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.error {
+  margin-top: 12px;
+  color: #b42318;
+  background: rgba(255, 0, 0, 0.06);
+  border: 1px solid rgba(255, 0, 0, 0.12);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   单位在条框后面（只影响特定输入）
+   结构：<div class="with-unit"><input class="unit-input" /><span class="unit-suffix">kg</span></div>
+   ========================= */
+
+.with-unit{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  /* “条框”的样式复用你 input 的风格 */
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* 让输入本体不再画边框/背景，避免出现“双层框” */
+.with-unit .unit-input{
+  width: 110px;          /* 你可以按需要调：90~140 */
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+
+  text-align: right;
+  font-size: 18px;       /* 跟整体风格一致，想更像 iOS 可调到 20~22 */
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+/* placeholder 的 --- */
+.with-unit .unit-input::placeholder{
+  color: rgba(0,0,0,0.25);
+  font-weight: 800;
+}
+
+/* 单位（kg/回/セット）在条框后面 */
+.with-unit .unit-suffix{
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+/* focus 效果：复用你原本 input:focus 的蓝色光晕 */
+.with-unit:focus-within{
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+}
+
+
+/* ===== ワークアウトカードの右上ゴミ箱 ===== */
+.workout-card {
+  position: relative;
+}
+
+.workout-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workout-main{
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.workout-sets{
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.workout-setline{
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* ゴミ箱ボタン（Appleっぽく控えめ） */
+.delete-btn{
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.04);
+  border-radius: 999px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  color: rgba(0,0,0,0.55);
+  box-shadow: none;
+  transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+
+.delete-btn:hover{
+  transform: scale(1.06);
+  color: #b42318;
+  background: rgba(180, 35, 24, 0.10);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.10);
+}
