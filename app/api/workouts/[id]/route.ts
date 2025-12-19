@@ -1,25 +1,35 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
 
 export const runtime = "nodejs";
 
-export async function DELETE(_: Request, ctx: { params: { id: string } }) {
-  try {
-    const id = Number(ctx.params.id);
-    if (!Number.isFinite(id)) {
-      return NextResponse.json({ error: "invalid id" }, { status: 400 });
-    }
+type Params = { id: string };
+type Ctx = { params: Promise<Params> };
 
-    const tx = db.transaction(() => {
-      db.prepare(`DELETE FROM workout_sets WHERE workout_id = ?`).run(id);
-      const info = db.prepare(`DELETE FROM workouts WHERE id = ?`).run(id);
-      return info.changes;
-    });
+// GET /api/workouts/[id]
+export async function GET(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params; // ✅ Next16: params 是 Promise
+  const numId = Number(id);
 
-    const changes = tx();
-    return NextResponse.json({ ok: true, deleted: changes });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "failed to delete" }, { status: 500 });
+  if (!Number.isFinite(numId)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
+
+  const row = db.prepare("SELECT * FROM workouts WHERE id = ?").get(numId);
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  return NextResponse.json(row);
+}
+
+// DELETE /api/workouts/[id]
+export async function DELETE(_req: NextRequest, { params }: Ctx) {
+  const { id } = await params;
+  const numId = Number(id);
+
+  if (!Number.isFinite(numId)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  const info = db.prepare("DELETE FROM workouts WHERE id = ?").run(numId);
+  return NextResponse.json({ ok: true, changes: info.changes });
 }
