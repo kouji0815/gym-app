@@ -27,22 +27,22 @@ export async function POST(req: Request) {
     const sets = Array.isArray(body?.sets) ? body.sets : [];
 
     if (!date || !isValidDate(date)) {
-      return NextResponse.json({ error: "日付が不正です" }, { status: 400 });
+      return NextResponse.json({ error: "日期不正确" }, { status: 400 });
     }
     if (!exercise) {
-      return NextResponse.json({ error: "種目名が必要です" }, { status: 400 });
+      return NextResponse.json({ error: "请输入種目名" }, { status: 400 });
     }
     if (sets.length === 0) {
-      return NextResponse.json({ error: "セットを1つ以上入力してください" }, { status: 400 });
+      return NextResponse.json({ error: "组数需要输入1以上" }, { status: 400 });
     }
 
     // ここで厳密チェック（空文字 → 0 の事故を防ぐのはフロント側が主だが、APIでも守る）
     for (const s of sets) {
       if (!isFiniteNumber((s as any).weight) || !isFiniteNumber((s as any).reps)) {
-        return NextResponse.json({ error: "重量/回数が不正です" }, { status: 400 });
+        return NextResponse.json({ error: "重量/回数不正确" }, { status: 400 });
       }
       if ((s as any).weight < 0 || (s as any).reps <= 0) {
-        return NextResponse.json({ error: "重量/回数の範囲が不正です" }, { status: 400 });
+        return NextResponse.json({ error: "重量/回数的范围不正确" }, { status: 400 });
       }
     }
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, id }, { status: 201 });
   } catch (e) {
     console.error("POST /api/workouts error:", e);
-    return NextResponse.json({ error: "保存に失敗しました" }, { status: 500 });
+    return NextResponse.json({ error: "保存失败" }, { status: 500 });
   }
 }
 
@@ -97,14 +97,14 @@ export async function GET(req: Request) {
     }
     if (from) {
       if (!isValidDate(from)) {
-        return NextResponse.json({ error: "from が不正です" }, { status: 400 });
+        return NextResponse.json({ error: "from 不正确" }, { status: 400 });
       }
       where.push("w.date >= ?");
       params.push(from);
     }
     if (to) {
       if (!isValidDate(to)) {
-        return NextResponse.json({ error: "to が不正です" }, { status: 400 });
+        return NextResponse.json({ error: "to 不正确" }, { status: 400 });
       }
       where.push("w.date <= ?");
       params.push(to);
@@ -137,7 +137,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ workouts: result });
   } catch (e) {
     console.error("GET /api/workouts error:", e);
-    return NextResponse.json({ error: "読み込みに失敗しました" }, { status: 500 });
+    return NextResponse.json({ error: "读取失败" }, { status: 500 });
   }
 }
 
@@ -152,7 +152,7 @@ export async function DELETE(req: Request) {
 
     const id = Number(idStr);
     if (!idStr || !Number.isFinite(id) || id < 1) {
-      return NextResponse.json({ error: "id が不正です" }, { status: 400 });
+      return NextResponse.json({ error: "id 不正确" }, { status: 400 });
     }
 
     const delSets = db.prepare(`DELETE FROM workout_sets WHERE workout_id = ?`);
@@ -172,6 +172,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE /api/workouts error:", e);
-    return NextResponse.json({ error: "削除に失敗しました" }, { status: 500 });
+    return NextResponse.json({ error: "删除失败" }, { status: 500 });
   }
 }

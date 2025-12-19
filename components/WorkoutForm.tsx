@@ -82,7 +82,7 @@ export default function WorkoutForm() {
     <div className="card">
       <h2 className="h2">记录训练</h2>
       <p className="muted">
-        像健身 App 一样，只输入一次，系统自动生成全部セット
+
       </p>
 
       <div className="mt-16 form-grid">
@@ -157,7 +157,7 @@ export default function WorkoutForm() {
                 value={setCount}
                 onChange={(e) => setSetCount(e.target.value)}
               />
-              <span className="unit-suffix">セット</span>
+              <span className="unit-suffix">组</span>
             </div>
           </div>
         </div>
