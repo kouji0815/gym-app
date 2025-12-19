@@ -109,7 +109,7 @@ export default function WorkoutForm() {
       <div className="ios-card mt-16">
         {/* 重さ */}
         <div className="ios-row">
-          <div className="ios-label">重さ</div>
+          <div className="ios-label">重量</div>
           <div className="ios-right">
             <div className="with-unit">
               <input
@@ -128,7 +128,7 @@ export default function WorkoutForm() {
 
         {/* 回数 */}
         <div className="ios-row">
-          <div className="ios-label">回数</div>
+          <div className="ios-label">数量</div>
           <div className="ios-right">
             <div className="with-unit">
               <input
@@ -147,7 +147,7 @@ export default function WorkoutForm() {
 
         {/* セット */}
         <div className="ios-row">
-          <div className="ios-label">セット</div>
+          <div className="ios-label">组数</div>
           <div className="ios-right">
             <div className="with-unit">
               <input
@@ -164,7 +164,7 @@ export default function WorkoutForm() {
       </div>
 
       <button className="btn btn-primary mt-16" onClick={submit}>
-        记录する
+        记录
       </button>
     </div>
   );
