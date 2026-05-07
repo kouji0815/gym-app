@@ -28,7 +28,7 @@ export default function WorkoutForm() {
     const c = Math.floor(cRaw);
 
     if (!exercise.trim()) {
-      alert("请输入训练名称");
+      alert("種目");
       return;
     }
 
@@ -43,7 +43,7 @@ export default function WorkoutForm() {
       r < 1 ||
       c < 1
     ) {
-      alert("请输入正确的重量、次数和组数");
+      alert("正しい重量、回数、セットを入力");
       return;
     }
 
@@ -68,26 +68,26 @@ export default function WorkoutForm() {
       });
 
       if (!res.ok) {
-        alert("保存失败");
+        alert("保存失敗");
         return;
       }
 
       router.push("/");
     } catch {
-      alert("网络错误");
+      alert("ネットワークエラー");
     }
   }
 
   return (
     <div className="card">
-      <h2 className="h2">记录训练</h2>
+      <h2 className="h2">記録</h2>
       <p className="muted">
 
       </p>
 
       <div className="mt-16 form-grid">
         <label>
-          训练名称
+          種目名
           <input
             placeholder="例如：Bench Press"
             value={exercise}
@@ -96,7 +96,7 @@ export default function WorkoutForm() {
         </label>
 
         <label>
-          日期
+          日付
           <input
             type="date"
             value={date}
@@ -128,7 +128,7 @@ export default function WorkoutForm() {
 
         {/* 回数 */}
         <div className="ios-row">
-          <div className="ios-label">数量</div>
+          <div className="ios-label">回数</div>
           <div className="ios-right">
             <div className="with-unit">
               <input
@@ -147,7 +147,7 @@ export default function WorkoutForm() {
 
         {/* セット */}
         <div className="ios-row">
-          <div className="ios-label">组数</div>
+          <div className="ios-label">セット数</div>
           <div className="ios-right">
             <div className="with-unit">
               <input
@@ -157,14 +157,14 @@ export default function WorkoutForm() {
                 value={setCount}
                 onChange={(e) => setSetCount(e.target.value)}
               />
-              <span className="unit-suffix">组</span>
+              <span className="unit-suffix">セット</span>
             </div>
           </div>
         </div>
       </div>
 
       <button className="btn btn-primary mt-16" onClick={submit}>
-        记录
+        記録
       </button>
     </div>
   );

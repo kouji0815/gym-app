@@ -46,14 +46,14 @@ export default function Charts({ exercise }: { exercise: string }) {
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError(json?.error ?? "读取数据失败");
+        setError(json?.error ?? "データ読み込み失敗");
         return;
       }
 
       setWorkouts(Array.isArray(json?.workouts) ? json.workouts : []);
     } catch (e) {
       console.error(e);
-      setError("网络错误");
+      setError("ネットワークのエラー");
     } finally {
       setLoading(false);
     }
@@ -98,9 +98,9 @@ export default function Charts({ exercise }: { exercise: string }) {
     <section className="card mt-16">
       <div className="card-head">
         <div>
-          <h2 className="h2">训练趋势</h2>
+          <h2 className="h2">成長</h2>
           <p className="muted">
-            {exercise ? `训练动作：${exercise}` : "训练动作：全部"}
+            {exercise ? `種目：${exercise}` : "種目：全部"}
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function Charts({ exercise }: { exercise: string }) {
           onClick={load}
           disabled={loading}
         >
-          {loading ? "刷新中…" : "刷新"}
+          {loading ? "更新中…" : "更新"}
         </button>
       </div>
 
@@ -118,7 +118,7 @@ export default function Charts({ exercise }: { exercise: string }) {
       {/* 不显示总训练容量（用户需求） */}
       <div className="stats">
         <div className="stat">
-          <div className="stat-label">训练次数</div>
+          <div className="stat-label">回数</div>
           <div className="stat-value">{summary.totalSessions}</div>
         </div>
         <div className="stat">
@@ -129,7 +129,7 @@ export default function Charts({ exercise }: { exercise: string }) {
 
       {trend.length === 0 ? (
         <div className="empty">
-          还没有记录，点击「进入记录页面」开始训练记录
+          まだ記録がない，「記録画面」を押してください
         </div>
       ) : (
         <div className="chart-wrap">
@@ -169,14 +169,14 @@ export default function Charts({ exercise }: { exercise: string }) {
 
             {w.notes ? (
               <div style={{ color: "#444", marginTop: 6 }}>
-                备注：{w.notes}
+                メモ：{w.notes}
               </div>
             ) : null}
 
             <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
               {w.sets.map((s) => (
                 <div key={s.set_index} style={{ color: "#222" }}>
-                  第 {s.set_index} 组：{s.weight} kg × {s.reps} 次
+                  第 {s.set_index} セット：{s.weight} kg × {s.reps} 回
                 </div>
               ))}
             </div>

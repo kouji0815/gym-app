@@ -13,9 +13,9 @@ export default function Filters({
   return (
     <div className="card" style={{ marginTop: 20 }}>
       <label>
-        项目筛选
+        種目絞る
         <input
-          placeholder="例如：Bench / Squat"
+          placeholder="例えば：Bench / Squat"
           value={exercise}
           onChange={(e) => setExercise(e.target.value)}
         />

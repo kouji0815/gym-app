@@ -15,11 +15,11 @@ export default function HomePage() {
 
   return (
     <main>
-      <h1>健身记录</h1>
+      <h1>ジム記録</h1>
 
       <Link href="/log">
         <button className="btn-primary" style={{ width: "100%" }}>
-          ＋ 进入记录页面
+          ＋ 記録画面
         </button>
       </Link>
 
