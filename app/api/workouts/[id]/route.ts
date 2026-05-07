@@ -1,35 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export const runtime = "nodejs";
-
-type Params = { id: string };
-type Ctx = { params: Promise<Params> };
-
-// GET /api/workouts/[id]
-export async function GET(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params; // ✅ Next16: params 是 Promise
-  const numId = Number(id);
-
-  if (!Number.isFinite(numId)) {
-    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+export async function GET() {
+  try {
+    // 使用 Prisma 从 TiDB 获取所有数据
+    const workouts = await prisma.workout.findMany({
+      include: { sets: true },
+      orderBy: { date: 'desc' }
+    });
+    return NextResponse.json(workouts);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "データ取得失敗" }, { status: 500 });
   }
-
-  const row = db.prepare("SELECT * FROM workouts WHERE id = ?").get(numId);
-  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  return NextResponse.json(row);
 }
 
-// DELETE /api/workouts/[id]
-export async function DELETE(_req: NextRequest, { params }: Ctx) {
-  const { id } = await params;
-  const numId = Number(id);
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { date, exercise, sets } = body;
 
-  if (!Number.isFinite(numId)) {
-    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    const newWorkout = await prisma.workout.create({
+      data: {
+        date: new Date(date).toISOString().split('T')[0],
+        exercise,
+        sets: {
+          create: sets.map((s: any, index: number) => ({
+            weight: s.weight,
+            reps: s.reps,
+            setIndex: index
+          }))
+        }
+      }
+    });
+    return NextResponse.json(newWorkout);
+  } catch (e) {
+    return NextResponse.json({ error: "保存失敗" }, { status: 500 });
   }
-
-  const info = db.prepare("DELETE FROM workouts WHERE id = ?").run(numId);
-  return NextResponse.json({ ok: true, changes: info.changes });
 }
