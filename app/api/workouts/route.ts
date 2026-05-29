@@ -103,6 +103,52 @@ export async function GET(req: Request) {
 }
 
 /**
+ * PUT /api/workouts?id=xxx
+ * 記録の更新（セットを全削除→再作成）
+ */
+export async function PUT(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const id = Number(url.searchParams.get("id"));
+    if (!id || id < 1) return NextResponse.json({ error: "無効なIDです" }, { status: 400 });
+
+    const body = await req.json();
+    const date = body?.date?.trim();
+    const exercise = body?.exercise?.trim();
+    const notes = body?.notes?.trim() || null;
+    const sets = Array.isArray(body?.sets) ? body.sets : [];
+
+    if (!date || !isValidDate(date)) return NextResponse.json({ error: "日付の形式が正しくありません" }, { status: 400 });
+    if (!exercise) return NextResponse.json({ error: "種目名を入力してください" }, { status: 400 });
+    if (sets.length === 0) return NextResponse.json({ error: "セット情報を1つ以上入力してください" }, { status: 400 });
+
+    await prisma.$transaction([
+      prisma.workoutSet.deleteMany({ where: { workoutId: id } }),
+      prisma.workout.update({
+        where: { id },
+        data: {
+          date,
+          exercise,
+          notes,
+          sets: {
+            create: sets.map((s: { weight: number; reps: number }, i: number) => ({
+              setIndex: i + 1,
+              weight: Number(s.weight),
+              reps: Number(s.reps),
+            })),
+          },
+        },
+      }),
+    ]);
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("更新エラー:", e);
+    return NextResponse.json({ error: "更新に失敗しました" }, { status: 500 });
+  }
+}
+
+/**
  * DELETE /api/workouts?id=xxx
  * 履歴の削除
  */

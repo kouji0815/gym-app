@@ -27,3 +27,20 @@ model WorkoutSet {
   weight    Float
   reps      Int
 }
+
+model Template {
+  id        Int           @id @default(autoincrement())
+  name      String
+  exercise  String
+  sets      TemplateSet[]
+  createdAt DateTime      @default(now())
+}
+
+model TemplateSet {
+  id         Int      @id @default(autoincrement())
+  templateId Int
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  setIndex   Int
+  weight     Float
+  reps       Int
+}
