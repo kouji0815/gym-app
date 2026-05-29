@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { calcOneRM, calcVolume, thisWeekDays } from "@/lib/utils";
+import { calcOneRM, thisWeekDays } from "@/lib/utils";
 
 type WorkoutSet = { setIndex: number; weight: number; reps: number };
 type Workout = {
@@ -177,40 +177,35 @@ export default function Charts({ exercise }: { exercise: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise]);
 
-  // トレンドデータ（avgWeight + volume）
+  // トレンドデータ（平均重量のみ）
   const trend = useMemo(() => {
-    const map = new Map<string, { date: string; totalWeight: number; totalReps: number; volume: number }>();
+    const map = new Map<string, { totalWeight: number; totalReps: number }>();
     for (const w of workouts) {
-      const vol = calcVolume(w);
-      const cur = map.get(w.date) ?? { date: w.date, totalWeight: 0, totalReps: 0, volume: 0 };
+      const cur = map.get(w.date) ?? { totalWeight: 0, totalReps: 0 };
       for (const s of w.sets) {
         cur.totalWeight += s.weight * s.reps;
         cur.totalReps += s.reps;
       }
-      cur.volume += vol;
       map.set(w.date, cur);
     }
-    return Array.from(map.values())
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map((d) => ({
-        date: d.date,
-        avgWeight: d.totalReps > 0 ? d.totalWeight / d.totalReps : 0,
-        volume: d.volume,
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, d]) => ({
+        label: date.slice(5),
+        avgWeight: d.totalReps > 0 ? +(d.totalWeight / d.totalReps).toFixed(1) : 0,
       }));
   }, [workouts]);
 
   // サマリー統計
   const summary = useMemo(() => {
     const bestOneRM = workouts.reduce((mx, w) => Math.max(mx, calcBestOneRM(w)), 0);
-    const totalVolume = workouts.reduce((sum, w) => sum + calcVolume(w), 0);
     const weekDays = thisWeekDays(workouts);
-    // 全期間の平均重量（全セットをまとめて計算）
     let allWeight = 0, allReps = 0;
     for (const w of workouts) {
       for (const s of w.sets) { allWeight += s.weight * s.reps; allReps += s.reps; }
     }
     const overallAvg = allReps > 0 ? allWeight / allReps : 0;
-    return { totalSessions: workouts.length, overallAvg, bestOneRM, totalVolume, weekDays };
+    return { totalSessions: workouts.length, overallAvg, bestOneRM, weekDays };
   }, [workouts]);
 
   // PRマップ（種目ごとの最高topWeight）
@@ -284,13 +279,13 @@ export default function Charts({ exercise }: { exercise: string }) {
       {error && <div className="error">{error}</div>}
 
       {/* サマリーカード */}
-      <div className="stats stats-5">
+      <div className="stats">
         <div className="stat">
-          <div className="stat-label">回数</div>
+          <div className="stat-label">セッション数</div>
           <div className="stat-value">{summary.totalSessions}</div>
         </div>
         <div className="stat">
-          <div className="stat-label">平均重量（全期間）</div>
+          <div className="stat-label">平均重量</div>
           <div className="stat-value">{summary.overallAvg.toFixed(1)} kg</div>
         </div>
         <div className="stat">
@@ -303,10 +298,6 @@ export default function Charts({ exercise }: { exercise: string }) {
             {summary.weekDays}日{summary.weekDays > 0 ? " 🔥" : ""}
           </div>
         </div>
-        <div className="stat">
-          <div className="stat-label">合計ボリューム</div>
-          <div className="stat-value">{summary.totalVolume.toFixed(0)} kg</div>
-        </div>
       </div>
 
       {/* トレンドチャート */}
@@ -317,18 +308,46 @@ export default function Charts({ exercise }: { exercise: string }) {
           <ResponsiveContainer>
             <LineChart data={trend} margin={{ top: 12, right: 56, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.07)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={(v) => v.slice(5)} />
-              <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}kg`} width={52} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}kg`} width={56} />
+              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+              <YAxis
+                yAxisId="left"
+                unit=" kg"
+                tick={{ fontSize: 11, fill: "#6e6e73" }}
+                tickLine={false}
+                axisLine={false}
+                width={52}
+                domain={([dataMin, dataMax]: readonly [number, number]) => [
+                  Math.floor(dataMin * 0.95),
+                  Math.ceil(dataMax * 1.05),
+                ] as [number, number]}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                unit=" kg"
+                tick={{ fontSize: 11, fill: "#6e6e73" }}
+                tickLine={false}
+                axisLine={false}
+                width={52}
+                domain={([dataMin, dataMax]: readonly [number, number]) => [
+                  Math.floor(dataMin * 0.95),
+                  Math.ceil(dataMax * 1.05),
+                ] as [number, number]}
+              />
               <Tooltip
-                formatter={(v, name) => [
-                  `${Number(v).toFixed(1)} kg`,
-                  name === "avgWeight" ? "平均重量" : "ボリューム",
-                ]}
+                formatter={(v) => [`${Number(v).toFixed(1)} kg`, "平均重量"]}
                 labelFormatter={(l) => `日付：${l}`}
               />
-              <Line yAxisId="left" type="monotone" dataKey="avgWeight" name="avgWeight" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 4, fill: "#16a34a" }} activeDot={{ r: 6 }} />
-              <Line yAxisId="right" type="monotone" dataKey="volume" name="volume" stroke="#0071e3" strokeWidth={2} dot={false} strokeDasharray="5 3" />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="avgWeight"
+                name="平均重量"
+                stroke="#0071e3"
+                strokeWidth={2.5}
+                dot={{ r: 4, fill: "#0071e3", strokeWidth: 0 }}
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

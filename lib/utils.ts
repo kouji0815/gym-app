@@ -18,8 +18,3 @@ export function thisWeekDays(workouts: { date: string }[]): number {
   );
   return days.size;
 }
-
-// ワークアウト1件のトータルボリューム
-export function calcVolume(w: { sets: { weight: number; reps: number }[] }): number {
-  return w.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
-}
