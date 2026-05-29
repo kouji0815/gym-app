@@ -27,6 +27,13 @@ function calcTopWeight(w: Workout) {
   return w.sets.reduce((mx, s) => Math.max(mx, s.weight), 0);
 }
 
+function calcAvgWeight(w: Workout): number {
+  const totalWeight = w.sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+  const totalReps = w.sets.reduce((sum, s) => sum + s.reps, 0);
+  if (totalReps === 0) return 0;
+  return totalWeight / totalReps;
+}
+
 function calcBestOneRM(w: Workout) {
   return w.sets.reduce((mx, s) => Math.max(mx, calcOneRM(s.weight, s.reps)), 0);
 }
@@ -170,30 +177,40 @@ export default function Charts({ exercise }: { exercise: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise]);
 
-  // トレンドデータ（topWeight + volume）
+  // トレンドデータ（avgWeight + volume）
   const trend = useMemo(() => {
-    const map = new Map<string, { date: string; topWeight: number; volume: number }>();
+    const map = new Map<string, { date: string; totalWeight: number; totalReps: number; volume: number }>();
     for (const w of workouts) {
-      const top = calcTopWeight(w);
       const vol = calcVolume(w);
-      const cur = map.get(w.date);
-      if (!cur) {
-        map.set(w.date, { date: w.date, topWeight: top, volume: vol });
-      } else {
-        cur.topWeight = Math.max(cur.topWeight, top);
-        cur.volume += vol;
+      const cur = map.get(w.date) ?? { date: w.date, totalWeight: 0, totalReps: 0, volume: 0 };
+      for (const s of w.sets) {
+        cur.totalWeight += s.weight * s.reps;
+        cur.totalReps += s.reps;
       }
+      cur.volume += vol;
+      map.set(w.date, cur);
     }
-    return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+    return Array.from(map.values())
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((d) => ({
+        date: d.date,
+        avgWeight: d.totalReps > 0 ? d.totalWeight / d.totalReps : 0,
+        volume: d.volume,
+      }));
   }, [workouts]);
 
   // サマリー統計
   const summary = useMemo(() => {
-    const maxTop = workouts.reduce((mx, w) => Math.max(mx, calcTopWeight(w)), 0);
     const bestOneRM = workouts.reduce((mx, w) => Math.max(mx, calcBestOneRM(w)), 0);
     const totalVolume = workouts.reduce((sum, w) => sum + calcVolume(w), 0);
     const weekDays = thisWeekDays(workouts);
-    return { totalSessions: workouts.length, maxTop, bestOneRM, totalVolume, weekDays };
+    // 全期間の平均重量（全セットをまとめて計算）
+    let allWeight = 0, allReps = 0;
+    for (const w of workouts) {
+      for (const s of w.sets) { allWeight += s.weight * s.reps; allReps += s.reps; }
+    }
+    const overallAvg = allReps > 0 ? allWeight / allReps : 0;
+    return { totalSessions: workouts.length, overallAvg, bestOneRM, totalVolume, weekDays };
   }, [workouts]);
 
   // PRマップ（種目ごとの最高topWeight）
@@ -273,8 +290,8 @@ export default function Charts({ exercise }: { exercise: string }) {
           <div className="stat-value">{summary.totalSessions}</div>
         </div>
         <div className="stat">
-          <div className="stat-label">最高重量</div>
-          <div className="stat-value">{summary.maxTop.toFixed(1)} kg</div>
+          <div className="stat-label">平均重量（全期間）</div>
+          <div className="stat-value">{summary.overallAvg.toFixed(1)} kg</div>
         </div>
         <div className="stat">
           <div className="stat-label">推定1RM</div>
@@ -306,11 +323,11 @@ export default function Charts({ exercise }: { exercise: string }) {
               <Tooltip
                 formatter={(v, name) => [
                   `${Number(v).toFixed(1)} kg`,
-                  name === "topWeight" ? "Top set" : "ボリューム",
+                  name === "avgWeight" ? "平均重量" : "ボリューム",
                 ]}
                 labelFormatter={(l) => `日付：${l}`}
               />
-              <Line yAxisId="left" type="monotone" dataKey="topWeight" name="topWeight" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 4, fill: "#16a34a" }} activeDot={{ r: 6 }} />
+              <Line yAxisId="left" type="monotone" dataKey="avgWeight" name="avgWeight" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 4, fill: "#16a34a" }} activeDot={{ r: 6 }} />
               <Line yAxisId="right" type="monotone" dataKey="volume" name="volume" stroke="#0071e3" strokeWidth={2} dot={false} strokeDasharray="5 3" />
             </LineChart>
           </ResponsiveContainer>
